@@ -4,7 +4,7 @@ import java.util.*;
 /**
  * Created by skoded001c on 8/29/16.
  */
-public class Solution {
+public class RectangularCover {
 
     public boolean isRectangleCover(int[][] rectangles) {
 
