@@ -5,8 +5,208 @@ import java.util.*;
  */
 public class MixedMethods {
 
-    public static void main(String args[]){
+    public static void main(String args[]) {
 
+    }
+
+    ArrayList<Integer> splitByValue(int k,
+                                    ArrayList<Integer> elements) {
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i) < k) {
+                result.add(elements.get(i));
+            }
+        }
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i) >= k) {
+                result.add(elements.get(i));
+            }
+        }
+        return result;
+    }
+
+    boolean areIsomorphic(int[][] array1, int[][] array2) {
+        if (array1.length != array2.length)
+            return false;
+        for (int i = 0; i < array1.length; i++) {
+            if (array1[i].length != array2[i].length)
+                return false;
+        }
+        return true;
+    }
+
+    int leastSignificantBit(int n) {
+
+        int ans = 1;
+        while ((n & 1) == 0) {
+            n >>= 1;
+            ans <<= 1;
+        }
+
+        return ans;
+    }
+
+    boolean isSumOfConsecutive(int n) {
+        for (int start = 1; start < n; start++) {
+            int number = n,
+                    subtrahend = start;
+            while (number > 0) {
+                number -= subtrahend;
+                subtrahend++;
+            }
+            if (number == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    int[][] matrixTransposition(int[][] matrix) {
+
+        int[][] result = new int[matrix[0].length][matrix.length];
+        for (int i = 0; i < matrix[0].length; i++) {
+            for (int j = 0; j < matrix.length; j++) {
+                result[i][j] = matrix[j][i];
+            }
+        }
+        return result;
+    }
+
+    static int[] zFunctionNaive(String s) {
+        int[] Z = new int[s.length()];
+        int n = s.length();
+        int L, R, k;
+
+        // [L,R] make a window which matches with prefix of s
+        L=R=0;
+        for(
+        int i = 1;
+        i<n;++i)
+
+        {
+            // if i>R nothing matches so we will calculate.
+            // Z[i] using naive way.
+            if (i > R) {
+                L = R = i;
+
+                // R-L = 0 in starting, so it will start
+                // checking from 0'th index. For example,
+                // for "ababab" and i = 1, the value of R
+                // remains 0 and Z[i] becomes 0. For string
+                // "aaaaaa" and i = 1, Z[i] and R become 5
+                while (R < n && s.charAt(R - L) == s.charAt(R))
+                    R++;
+                Z[i] = R - L;
+                R--;
+            } else {
+                // k = i-L so k corresponds to number which
+                // matches in [L,R] interval.
+                k = i - L;
+
+                // if Z[k] is less than remaining interval
+                // then Z[i] will be equal to Z[k].
+                // For example, str = "ababab", i = 3, R = 5
+                // and L = 2
+                if (Z[k] < R - i + 1)
+                    Z[i] = Z[k];
+
+                    // For example str = "aaaaaa" and i = 2, R is 5,
+                    // L is 0
+                else {
+                    //  else start from R  and check manually
+                    L = i;
+                    while (R < n && s.charAt(R - L) == s.charAt(R))
+                        R++;
+                    Z[i] = R - L;
+                    R--;
+                }
+            }
+        }
+
+        Z[0]=n; // CodeFights test are passed
+        return Z;
+    }
+
+    int[] bfsDistancesUnweightedGraph(boolean[][] matrix, int startVertex) {
+
+        boolean[] visited = new boolean[matrix.length];
+        LinkedList<Integer> queue = new LinkedList<>();
+        int[] distance = new int[matrix.length];
+        queue.add(startVertex);
+        while (queue.size() != 0) {
+            int currentVertex = queue.pop();
+            visited[currentVertex] = true;
+            for (int nextVertex = 0; nextVertex < matrix.length; nextVertex++) {
+                if (matrix[currentVertex][nextVertex] && !visited[nextVertex]) {
+                    visited[nextVertex] = true;
+                    distance[nextVertex] = distance[currentVertex] + 1;
+                    queue.add(nextVertex);
+                }
+            }
+        }
+
+        return distance;
+    }
+
+
+    int chessKnight(String cell) {
+        int row = Integer.parseInt("" + cell.charAt(1)),
+                column = cell.charAt(0) - 'a' + 1;
+        int[][] steps = {
+                {-2, -1}, {-1, -2}, {1, -2}, {2, -1},
+                {2, 1}, {1, 2}, {-1, 2}, {-2, 1}
+        };
+        int answer = 0;
+
+        for (int i = 0; i < steps.length; i++) {
+            int tmpRow = row + steps[i][0];
+            int tmpColumn = column + steps[i][1];
+            if (tmpRow >= 1 && tmpRow <= 8 &&
+                    tmpColumn >= 1 && tmpColumn <= 8) {
+                answer++;
+            }
+        }
+
+        return answer;
+    }
+
+    static int chartFix(int[] chart) {
+
+        ArrayList<Integer> toRemove = new ArrayList<>();
+        for (int i = 0; i < chart.length; i++) {
+            int cur = i;
+            for (int j = 0; j < i; j++) {
+                if (chart[j] < chart[i]) {
+                    cur = Math.min(cur, toRemove.get(j) + i - j);
+                }
+            }
+            toRemove.add(cur);
+        }
+
+        return toRemove.get(chart.length - 1);
+    }
+
+    int dfsComponentSize(boolean[][] matrix, int vertex) {
+        ArrayList<Integer> update = new ArrayList<Integer>();
+        update.add(vertex);
+        boolean[] v = new boolean[matrix.length];
+        v[vertex] = true;
+        int R = 1;
+        while(update.size()>0)
+        {
+            int i = update.get(0); update.remove(0);
+
+            for(int j = 0 ; j < matrix[i].length; j++)
+            {
+                if(matrix[i][j] && !v[j])
+                {
+                    v[j] = true;
+                    update.add(j);
+                    R++;
+                }
+            }
+        }
+        return R;
     }
 
     int axisAlignedCirclesBoundingBox(int[] x, int[] y, int[] r) {
