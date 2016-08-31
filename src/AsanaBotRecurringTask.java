@@ -11,16 +11,16 @@ import java.util.List;
  */
 public class AsanaBotRecurringTask {
 
-    String[] recurringTask(String firstDate, int k, String[] daysOfTheWeek, int n) {
+        String[] recurringTask(String firstDate, int k, String[] daysOfTheWeek, int n) {
 
         if(firstDate == null || k == 0 || daysOfTheWeek.length == 0 || n == 0)
             return null;
 
-        String[] finalData = new String[n];
+        Calendar c = Calendar.getInstance();
         String[] dayOfWeek = {"Sunday", "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
 
         DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Calendar c = Calendar.getInstance();
+
         Date date;
         try {
             date = sdf.parse(firstDate);
@@ -28,103 +28,53 @@ public class AsanaBotRecurringTask {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        List<String> myList = new ArrayList<>();
-        myList.add(0, firstDate);
-
-        int day = c.get(Calendar.DAY_OF_WEEK);
-        String dayWeek = dayOfWeek[day-1];
-        int diff = 0;
-        for(String s : daysOfTheWeek){
-            if(!s.equalsIgnoreCase(dayWeek)){
-                switch (s) {
-                    case "Monday": {
-                        diff = Calendar.MONDAY - c.get(Calendar.DAY_OF_WEEK);
-                        if (!(diff > 0)) {
-                            diff += 7;
-                        }
-                        c.add(Calendar.DAY_OF_MONTH, diff);
-                        break;
-                    }
-                    case "Tuesday": {
-                        diff = Calendar.TUESDAY - c.get(Calendar.DAY_OF_WEEK);
-                        if (!(diff > 0)) {
-                            diff += 7;
-                        }
-                        c.add(Calendar.DAY_OF_MONTH, diff);
-                        break;
-                    }
-                    case "Wednesday": {
-                        diff = Calendar.WEDNESDAY - c.get(Calendar.DAY_OF_WEEK);
-                        if (!(diff > 0)) {
-                            diff += 7;
-                        }
-                        c.add(Calendar.DAY_OF_MONTH, diff);
-                        break;
-                    }
-                    case "Thursday": {
-                        diff = Calendar.THURSDAY - c.get(Calendar.DAY_OF_WEEK);
-                        if (!(diff > 0)) {
-                            diff += 7;
-                        }
-                        c.add(Calendar.DAY_OF_MONTH, diff);
-                        break;
-                    }
-                    case "Friday": {
-                        diff = Calendar.FRIDAY - c.get(Calendar.DAY_OF_WEEK);
-                        if (!(diff > 0)) {
-                            diff += 7;
-                        }
-                        c.add(Calendar.DAY_OF_MONTH, diff);
-                        break;
-                    }
-                    case "Saturday": {
-                        diff = Calendar.SATURDAY - c.get(Calendar.DAY_OF_WEEK);
-                        if (!(diff > 0)) {
-                            diff += 7;
-                        }
-                        c.add(Calendar.DAY_OF_MONTH, diff);
-                        break;
-                    }
-                    case "Sunday": {
-                        diff = Calendar.SUNDAY - c.get(Calendar.DAY_OF_WEEK);
-                        if (!(diff > 0)) {
-                            diff += 7;
-                        }
-                        c.add(Calendar.DAY_OF_MONTH, diff);
-                        break;
-                    }
-                    default:
-                        break;
-                }
-                if(n>1)
-                    myList.add(1,sdf.format(c.getTime()));
-            }
-
+        int wd = c.get(Calendar.DAY_OF_WEEK)-1;
+        List<Integer> dow = new ArrayList<>();
+        for(String s : daysOfTheWeek) {
+            dow.add(Arrays.asList(dayOfWeek).indexOf(s));
         }
 
-        List<String> temp = new ArrayList<>();
-        temp.addAll(myList);
-        for(String s : temp){
+        List<String> myList = getRecDays(firstDate, dow, wd, c, sdf);
+
+        String last = myList.get(0);
+
+        while(myList.size() < n){
             try {
-                date = sdf.parse(s);
+                date = sdf.parse(last);
                 c.setTime(date);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
             c.add(Calendar.DAY_OF_MONTH, (k * 7));
+            List<String> nexts = getRecDays(sdf.format(c.getTime()), dow, c.get(Calendar.DAY_OF_WEEK)-1, c, sdf);
+            last = nexts.get(0);
+            myList.addAll(nexts);
+        }
 
-            for(int i=2; i<=n; i++) {
-                myList.add(myList.size(), sdf.format(c.getTime()));
-                break;
+        String[] finaldata = new String[myList.size()];
+        return myList.toArray(finaldata);
+    }
+
+    static List<String> getRecDays(String firstDate,List<Integer> dow, int wd, Calendar c, DateFormat sdf){
+        List<String> myList = new ArrayList<>();
+        myList.add(firstDate);
+
+        for(int i=0; i < dow.size(); i++){
+            int day = dow.get(i);
+
+            if(day == wd) continue;
+
+            int diff = day - wd;
+
+            if(diff < 0){
+                diff = (7-wd) + day;
             }
 
+            c.add(Calendar.DAY_OF_MONTH, diff);
+
+            myList.add(sdf.format(c.getTime()));
         }
-        finalData = new String[myList.size()];
-        finalData = myList.toArray(finalData);
-
-        return finalData;
-
+        return myList;
     }
+    
 }
