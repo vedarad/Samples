@@ -3,7 +3,7 @@ import java.util.HashMap;
 /**
  * Created by sreenathkodedala on 8/30/16.
  */
-public class SomeTests {
+public class MixedMethods {
 
     public static void main(String args[]){
 
