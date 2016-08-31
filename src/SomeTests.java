@@ -1,9 +1,153 @@
-
+import java.util.HashMap;
 
 /**
  * Created by sreenathkodedala on 8/30/16.
  */
 public class SomeTests {
+
+    public static void main(String args[]){
+
+    }
+
+    static int quotientKthDigitAfterDecimalPoint(int a, int b, int k) {
+
+        a %= b;
+        while (k > 1) {
+            a = (a * 10) % b;
+            k--;
+        }
+
+        return  a * 10 / b ;
+    }
+
+    int factorSum(int n) {
+        int curr = n;
+        while(true){
+            int sum = 0;
+            for(int i = 2; i <= curr; i++){
+                while(n % i == 0){
+                    sum += i;
+                    n /= i;
+                }
+            }
+            if(sum == curr) return curr;
+            else {
+                curr = sum;
+                n = curr;
+            }
+        }
+    }
+
+
+     /*typedef std::vector<std::vector<char>> matrix;
+
+    std::vector<int> throwingBlocks(matrix field) {
+        struct Helper {
+            bool isFirstColumnFull(matrix field) {
+                bool result = true;
+                for (int i = 0; i < field.size(); i++) {
+                    result &= field[i][0] == '#';
+                }
+                return result;
+            }
+
+        void countMoves(matrix& field, std::vector<int>& result, int moves) {
+            if (isFirstColumnFull(field)) {
+                result[0] = std::min(result[0], moves);
+                result[1] = std::max(result[1], moves);
+                return;
+            }
+            for (int i = 0; i < field.size(); i++) {
+                if (field[i][0] == '#') {
+                    continue;
+                }
+                int j = i;
+                int column = 0;
+                while (column < field[j].size() && field[j][column] == '.') {
+                    column++;
+                }
+                column--;
+                while (j < field.size() && field[j][column] == '.') {
+                    j++;
+                }
+                j--;
+                field[j][column] = '#';
+                countMoves(field, result, moves + 1);
+                field[j][column] = '.';
+            }
+        }
+        };
+
+        const int INF = field.size() * field[0].size() + 1;
+        std::vector<int> result{INF, -INF};
+        Helper h;
+        h.countMoves(field, result, 0);
+        return result;
+    }*/
+
+    static int[] throwingBlocks(char[][] field) {
+        class Helper {
+            boolean isFirstColumnFull(char[][] field) {
+                boolean result = true;
+                for (int i = 0; i < field.length; i++) {
+                    result &= field[i][0] == '#';
+                }
+                return result;
+            }
+
+            void countMoves(char[][] field, int[] result, int moves) {
+                if (isFirstColumnFull(field)) {
+                    result[0] = Math.min(result[0], moves);
+                    result[1] = Math.max(result[1], moves);
+                    return;
+                }
+                for (int i = 0; i < field.length; i++) {
+                    if (field[i][0] == '#') {
+                        continue;
+                    }
+                    int j = i;
+                    int column = 0;
+                    while (column < field[j].length && field[j][column] == '.') {
+                        column++;
+                    }
+                    column--;
+                    while (j < field.length && field[j][column] == '.') {
+                        j++;
+                    }
+                    j--;
+                    field[j][column] = '#';
+                    countMoves(field, result, moves + 1);
+                    field[j][column] = '.';
+                }
+            }
+        }
+
+        final int INF = field.length + field[0].length + 1;
+        int[] result = new int[]{INF, -INF};
+        Helper h = new Helper();
+        h.countMoves(field, result, 0);
+        return result;
+    }
+
+
+    static int squaresSumMinimization(int[] A) {
+
+        int indexOfMinimum = -1,
+                minimalSum = -1;
+
+        for (int x = A[0]; x <= A[A.length - 1]; x++) {
+            int sum = 0;
+            for (int j = 0; j < A.length; j++) {
+                sum += (A[j] - x) * (A[j] - x);
+            }
+            if (sum < minimalSum || indexOfMinimum == -1) {
+                minimalSum = sum;
+                indexOfMinimum = x;
+            }
+        }
+
+        return indexOfMinimum;
+    }
 
     static String caesarBoxCipherEncoding(String inputString) {
 
@@ -90,4 +234,29 @@ public class SomeTests {
         }
         return notPalindrome;
     }
+
+    int numberOfAnagrams(String S) {
+        HashMap<Character,Integer> set = new HashMap<Character,Integer>();
+        for(int i = 0; i < S.length(); i++) {
+            char item = S.charAt(i);
+            if(!set.containsKey(item)) {
+                set.put(item,1);
+            } else {
+                int freq = set.get(item);
+                set.put(item,freq+1);
+            }
+        }
+        int result = factorial(S.length());
+        for(Character item : set.keySet()) {
+            result /= factorial(set.get(item));
+        }
+        return result;
+    }
+    int factorial(int n) {
+        if(n==0) return 1;
+        return n * factorial(n-1);
+    }
+
+
+
 }
