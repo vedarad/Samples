@@ -9,6 +9,49 @@ public class MixedMethods {
 
     }
 
+    int isSumOfConsecutive2(int n) {
+        int sum=0,c=0,j=0;
+        int count =0;
+        for(int i=1;i<n;i++)
+        {
+            sum=i;
+            j=i+1;
+
+
+            while(sum<n)
+            {
+                sum=sum+j;
+                j++;
+            }
+
+            if(sum==n)
+            {
+                count += 1;
+            }
+        }
+        return count;
+    }
+
+    boolean whoseTurn(String p) {
+
+        class Helper {
+
+            int color(int r, int c) {
+                return (r + c) % 2;
+            }
+        }
+        Helper h = new Helper();
+
+        int s = 0;
+        for (int i = 0; i < 4; i++) {
+            int c = p.charAt(i * 3) - 'a';
+            int r = p.charAt(i * 3 + 1) - '0';
+            s += h.color(r, c);
+        }
+
+        return s % 2 == 0;
+    }
+
     int differentSubstrings(String inputStr) {
         class Helper {
             void addNode(ArrayList<int[]> lastVersion) {
