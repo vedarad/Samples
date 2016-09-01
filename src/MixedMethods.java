@@ -9,6 +9,248 @@ public class MixedMethods {
 
     }
 
+    int differentSubstrings(String inputStr) {
+        class Helper {
+            void addNode(ArrayList<int[]> lastVersion) {
+                int[] line = new int[26];
+                lastVersion.add(line);
+            }
+        }
+        Helper h = new Helper();
+
+        int nodesCount = 1;
+        ArrayList<int[]> trie = new ArrayList<>();
+        h.addNode(trie);
+
+        for (int i = 0; i < inputStr.length(); i++) {
+            int currentNode = 0;
+            for (int j = i; j < inputStr.length(); j++) {
+                int symbol = inputStr.charAt(j) - 97;
+                if (trie.get(currentNode)[symbol] == 0) {
+                    h.addNode(trie);
+                    trie.get(currentNode)[symbol] = nodesCount;
+                    nodesCount++;
+                }
+                currentNode = trie.get(currentNode)[symbol];
+            }
+        }
+
+        return nodesCount - 1;
+    }
+
+    String capitalizeVowelsRegExp(String input) {
+        String r = "";
+        for (char c : input.toCharArray()) {
+            if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y') {
+                String s = String.valueOf(c);
+                r += s.toUpperCase();
+            } else {
+                r += c + "";
+            }
+        }
+        return r;
+    }
+
+    ArrayList<Integer> possibleHeights(int[] parent) {
+
+        class Graph {
+            ArrayList<Integer>[] edges;
+            int[] height;
+            boolean[] isPossibleHeight;
+
+            Graph(int[] parent) {
+                edges = new ArrayList[parent.length];
+                for (int i = 0; i < edges.length; i++) {
+                    edges[i] = new ArrayList();
+                }
+                for (int i = 1; i < parent.length; i++) {
+                    edges[parent[i]].add(i);
+                }
+                height = new int[parent.length];
+                isPossibleHeight = new boolean[parent.length];
+            }
+
+            void calcHeight(int v) {
+                for (int u : edges[v]) {
+                    calcHeight(u);
+                    height[v] = Math.max(height[v], height[u] + 1);
+                }
+                ArrayList<Integer>[] countHeights = new ArrayList[edges.length];
+                for (int i = 0; i < edges.length; i++) {
+                    countHeights[i] = new ArrayList<>();
+                }
+                for (int i = 0; i < edges[v].size(); i++) {
+                    int u = edges[v].get(i);
+                    countHeights[height[u]].add(u);
+                }
+                edges[v].clear();
+                for (int i = edges.length - 1; i >= 0; i--) {
+                    for (int j = 0; j < countHeights[i].size(); j++) {
+                        edges[v].add(countHeights[i].get(j));
+                    }
+                }
+            }
+
+            void findNewHeights(int v, int tailHeight) {
+                isPossibleHeight[Math.max(height[v], tailHeight)] = true;
+                int firstMaxHeight = tailHeight + 1;
+                int secondMaxHeight = tailHeight + 1;
+                if (edges[v].size() > 0) {
+                    firstMaxHeight = Math.max(firstMaxHeight, height[edges[v].get(0)] + 2);
+                }
+                //TODO
+                if (edges[v].size() > 0) {
+                    findNewHeights(edges[v].get(0), secondMaxHeight);
+                }
+                for (int i = 1; i < edges[v].size(); i++) {
+                    findNewHeights(edges[v].get(i), firstMaxHeight);
+                }
+            }
+        }
+
+        Graph g = new Graph(parent);
+        g.calcHeight(0);
+        g.findNewHeights(0, 0);
+
+        ArrayList<Integer> heights = new ArrayList<>();
+        for (int i = 0; i < parent.length; i++) {
+            if (g.isPossibleHeight[i]) {
+                heights.add(i);
+            }
+        }
+        return heights;
+    }
+
+
+    static int periodicSequence(int S0, int A, int B, int MOD) {
+        int[] M = new int[100000];
+
+        M[0] = S0;
+        for (int i = 1; i < M.length; i++) {
+            M[i] = (M[i - 1] * A + B) % MOD;
+            System.out.println(i + ": " + M[i]);
+            for (int j = 0; j < i; j++) {
+                if (M[i] == M[j]) {
+                    //System.out.println("\tS: "+i + " " + j);
+                    boolean T = true;
+                    for (int k = 0; k < i - j; k++) {
+                        M[i + k] = (M[i + k - 1] * A + B) % MOD;
+                        //System.out.println("\tK: "+k + " " + M[i+k] + " "+M[j+k]);
+                        if (M[i + k] != M[j + k]) {
+                            T = false;
+                            break;
+                        }
+                    }
+                    if (T)
+                        return i - j;
+                }
+            }
+        }
+        return -1;
+    }
+
+    //TODO
+    String[] repeatedSubstring(String inputString, int k) {
+
+        List<String> result = new ArrayList<>();
+        boolean[] used = new boolean[inputString.length()];
+
+        for (int i = 0; i + k <= inputString.length(); i++) {
+            if (!used[i]) {
+                used[i] = true;
+                boolean found = false;
+                for (int j = i + 1; j + k <= inputString.length(); j++) {
+                    boolean equal = true;
+                    for (int p = 0; p < k; p++) {
+                        if (inputString.charAt(i + p) != inputString.charAt(j + p)) {
+                            equal = false;
+                            break;
+                        }
+                    }
+                    if (equal) {
+                        found = true;
+                        used[j] = true;
+                    }
+                }
+                if (found) {
+                    StringBuilder occurence = new StringBuilder();
+                    for (int l = i; l < i + k; l++)
+                        occurence.append(inputString.charAt(l));
+                    result.add(occurence.toString());
+                }
+            }
+        }
+
+        Collections.sort(result);
+        return result.toArray(new String[result.size()]);
+    }
+
+
+    //TODO
+    static int holiday(int x, String weekDay, String month, int yearNumber) {
+        final List<String> months = new ArrayList<String>(
+                Arrays.asList(new String[]{
+                        "January", "February", "March", "April",
+                        "May", "June", "July", "August",
+                        "September", "October", "November", "December"
+                }));
+        final List<String> daysInWeek = new ArrayList<String>(
+                Arrays.asList(new String[]{
+                        "Monday", "Tuesday", "Wednesday",
+                        "Thursday", "Friday", "Saturday", "Sunday"
+                }));
+        final int[] days = new int[]{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+        class Helper {
+            boolean isLeap(int year) {
+                return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+            }
+
+            int countLeap(int yearLeft, int yearRight) {
+                int result = 0;
+                for (int i = yearLeft; i <= yearRight; i++) {
+                    if (isLeap(i)) {
+                        result++;
+                    }
+                }
+                return result;
+            }
+
+            int getDaysInMonth(int month, int year) {
+                int result = days[month];
+                if (isLeap(year) && month == 1) {
+                    result++;
+                }
+                return result;
+            }
+        }
+
+        int weekDayInt = daysInWeek.indexOf(weekDay);
+        int monthInt = months.indexOf(month);
+
+        /*01 January 2015 is Thursday*/
+        Helper h = new Helper();
+        int leaps = h.countLeap(2015, yearNumber - 1);
+        int newWeekDay = (daysInWeek.indexOf("Thursday") + leaps * 366 +
+                (yearNumber - 2015 - leaps) * 365) % 7;
+        for (int i = 0; i < monthInt; i++) {
+            newWeekDay = (newWeekDay + h.getDaysInMonth(i, yearNumber)) % 7;
+        }
+        int daysCount = 0;
+        int daysInMonth = h.getDaysInMonth(monthInt, yearNumber);
+        for (int i = 1; i <= daysInMonth; i++) {
+            if (newWeekDay == weekDayInt) {
+                daysCount++;
+            }
+            if (daysCount == x) {
+                return i;
+            }
+            newWeekDay = (newWeekDay + 1) % 7;
+        }
+        return -1;
+    }
+
+
     ArrayList<Integer> splitByValue(int k,
                                     ArrayList<Integer> elements) {
         ArrayList<Integer> result = new ArrayList<>();
@@ -78,10 +320,10 @@ public class MixedMethods {
         int L, R, k;
 
         // [L,R] make a window which matches with prefix of s
-        L=R=0;
-        for(
-        int i = 1;
-        i<n;++i)
+        L = R = 0;
+        for (
+                int i = 1;
+                i < n; ++i)
 
         {
             // if i>R nothing matches so we will calculate.
@@ -123,7 +365,7 @@ public class MixedMethods {
             }
         }
 
-        Z[0]=n; // CodeFights test are passed
+        Z[0] = n; // CodeFights test are passed
         return Z;
     }
 
@@ -192,14 +434,12 @@ public class MixedMethods {
         boolean[] v = new boolean[matrix.length];
         v[vertex] = true;
         int R = 1;
-        while(update.size()>0)
-        {
-            int i = update.get(0); update.remove(0);
+        while (update.size() > 0) {
+            int i = update.get(0);
+            update.remove(0);
 
-            for(int j = 0 ; j < matrix[i].length; j++)
-            {
-                if(matrix[i][j] && !v[j])
-                {
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j] && !v[j]) {
                     v[j] = true;
                     update.add(j);
                     R++;
@@ -252,8 +492,7 @@ public class MixedMethods {
                 return "white";
             }
             return "black";
-        }
-        else {
+        } else {
             for (int i = 0; i < 4; i++) {
                 if (wHor == 9 - winningPairs[i][1] && bHor == 9 - winningPairs[i][0]) {
                     return "black";
@@ -339,13 +578,13 @@ public class MixedMethods {
 
     static String[] fileNaming(String[] names) {
         String[] s1 = new String[]{"s"};
-        Map<String,Integer> hMap = new HashMap<>();
-        int count =1;
-        for(String s: names){
-            if(hMap.containsKey(s))
-                hMap.put(s, count+1);
+        Map<String, Integer> hMap = new HashMap<>();
+        int count = 1;
+        for (String s : names) {
+            if (hMap.containsKey(s))
+                hMap.put(s, count + 1);
             else
-                hMap.put(s,count);
+                hMap.put(s, count);
         }
         return s1;
     }
@@ -404,15 +643,14 @@ public class MixedMethods {
             if (leftBound <= mask[i] &&
                     mask[i] <= rightBound) {
                 digitSum += mask[i] - leftBound;
-            }
-            else {
+            } else {
                 asteriskPos = i;
             }
         }
 
         for (int i = 0; i < 10; i++) {
             if ((digitSum + i) % 3 == 0) {
-                mask[asteriskPos] =  (char) (i+leftBound);
+                mask[asteriskPos] = (char) (i + leftBound);
                 if ((mask[mask.length - 1] - leftBound) % 2 == 0) {
                     answer.add(String.valueOf(mask));
                 }
@@ -423,9 +661,9 @@ public class MixedMethods {
     }
 
     boolean checkPalindrome(String inputString) {
-        for (int i = 0; i < inputString.length()/2; i++) {
+        for (int i = 0; i < inputString.length() / 2; i++) {
             if (inputString.charAt(i) !=
-                    inputString.charAt(inputString.length()-1-i)) return false;
+                    inputString.charAt(inputString.length() - 1 - i)) return false;
         }
         return true;
 
@@ -441,8 +679,8 @@ public class MixedMethods {
                 number = number / 10;
             }
             Collections.reverse(digits);
-            if (n <= digits.get(n-1)) {
-                return  n;
+            if (n <= digits.get(n - 1)) {
+                return n;
             }
             n -= digits.size();
         }
@@ -451,8 +689,7 @@ public class MixedMethods {
     boolean latinLettersSearchRegExp(String input) {
 
 
-        for (int i=0;i<input.length();i++)
-        {
+        for (int i = 0; i < input.length(); i++) {
             if (Character.isLetter(input.charAt(i)))
                 return true;
         }
@@ -485,9 +722,8 @@ public class MixedMethods {
             while (line.charAt(i) != '#' && base <= 16) {
                 if (line.charAt(i) != '_') {
                     if ('0' <= line.charAt(i) && line.charAt(i) <= '9') {
-                        base = base * 10 + (int)line.charAt(i) - (int)'0';
-                    }
-                    else {
+                        base = base * 10 + (int) line.charAt(i) - (int) '0';
+                    } else {
                         return false;
                     }
                 }
@@ -501,31 +737,28 @@ public class MixedMethods {
                 if (line.charAt(i) != '_') {
                     int digit = -1;
                     if ('a' <= line.charAt(i) && line.charAt(i) <= 'f') {
-                        digit = (int)line.charAt(i) - (int)'a' + 10;
+                        digit = (int) line.charAt(i) - (int) 'a' + 10;
                     }
                     if ('A' <= line.charAt(i) && line.charAt(i) <= 'F') {
-                        digit = (int)line.charAt(i) - (int)'A' + 10;
+                        digit = (int) line.charAt(i) - (int) 'A' + 10;
                     }
                     if ('0' <= line.charAt(i) && line.charAt(i) <= '9') {
-                        digit = line.charAt(i) - (int)'0';
+                        digit = line.charAt(i) - (int) '0';
                     }
                     if (0 <= digit && digit < base) {
                         atLeastOneDigit = true;
-                    }
-                    else {
+                    } else {
                         return false;
                     }
                 }
                 i++;
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < line.length(); i++) {
                 if (line.charAt(i) != '_') {
                     if ('0' <= line.charAt(i) && line.charAt(i) <= '9') {
                         atLeastOneDigit = true;
-                    }
-                    else {
+                    } else {
                         return false;
                     }
                 }
@@ -543,20 +776,20 @@ public class MixedMethods {
             k--;
         }
 
-        return  a * 10 / b ;
+        return a * 10 / b;
     }
 
     int factorSum(int n) {
         int curr = n;
-        while(true){
+        while (true) {
             int sum = 0;
-            for(int i = 2; i <= curr; i++){
-                while(n % i == 0){
+            for (int i = 2; i <= curr; i++) {
+                while (n % i == 0) {
                     sum += i;
                     n /= i;
                 }
             }
-            if(sum == curr) return curr;
+            if (sum == curr) return curr;
             else {
                 curr = sum;
                 n = curr;
@@ -678,11 +911,11 @@ public class MixedMethods {
 
     static String caesarBoxCipherEncoding(String inputString) {
 
-        int n = (int)Math.sqrt(inputString.length());
+        int n = (int) Math.sqrt(inputString.length());
         String ans = "";
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                ans += inputString.charAt(i + j*n);
+                ans += inputString.charAt(i + j * n);
             }
         }
 
@@ -695,7 +928,7 @@ public class MixedMethods {
                 tenPower = 1;
         while (n != 0) {
             int digit1 = n % 10,
-                    digit2 =  ((n - digit1) / 10) % 10;
+                    digit2 = ((n - digit1) / 10) % 10;
             result += tenPower * (10 * digit1 + digit2);
             n /= 100;
             tenPower *= 100;
@@ -706,15 +939,16 @@ public class MixedMethods {
     static boolean isPermutation(int n, int[] inputArray) {
 
         java.util.Arrays.sort(inputArray);
-        for(int index = 0 ; index <=inputArray.length-1 ; index++)
-        {
-            System.out.println(""+inputArray[index]+" "+index);
-            if(inputArray[index] != index + 1){return false;}
+        for (int index = 0; index <= inputArray.length - 1; index++) {
+            System.out.println("" + inputArray[index] + " " + index);
+            if (inputArray[index] != index + 1) {
+                return false;
+            }
         }
         return true;
     }
 
-    static int finalizeColoring(int[][]  board) {
+    static int finalizeColoring(int[][] board) {
 
         boolean[] found = new boolean[2];
         int[] evenness = new int[2];
@@ -726,8 +960,7 @@ public class MixedMethods {
                         if (evenness[board[i][j] - 1] != (i + j) % 2) {
                             return 0;
                         }
-                    }
-                    else {
+                    } else {
                         found[board[i][j] - 1] = true;
                         evenness[board[i][j] - 1] = (i + j) % 2;
                     }
@@ -735,7 +968,7 @@ public class MixedMethods {
             }
         }
 
-        if (evenness[0] ==1 && evenness[1]==1) {
+        if (evenness[0] == 1 && evenness[1] == 1) {
             return 0;
         }
 
@@ -750,11 +983,11 @@ public class MixedMethods {
 
         boolean notPalindrome = false;
 
-        inputString = inputString.replaceAll("[^a-zA-Z]+","").toLowerCase();
+        inputString = inputString.replaceAll("[^a-zA-Z]+", "").toLowerCase();
 
         char[] array = inputString.toCharArray();
-        for(int i=0, j=array.length-1; i<j; i++, j--) {
-            if(array[i] != array[j]) {
+        for (int i = 0, j = array.length - 1; i < j; i++, j--) {
+            if (array[i] != array[j]) {
                 notPalindrome = true;
                 break;
             }
@@ -763,27 +996,27 @@ public class MixedMethods {
     }
 
     int numberOfAnagrams(String S) {
-        HashMap<Character,Integer> set = new HashMap<Character,Integer>();
-        for(int i = 0; i < S.length(); i++) {
+        HashMap<Character, Integer> set = new HashMap<Character, Integer>();
+        for (int i = 0; i < S.length(); i++) {
             char item = S.charAt(i);
-            if(!set.containsKey(item)) {
-                set.put(item,1);
+            if (!set.containsKey(item)) {
+                set.put(item, 1);
             } else {
                 int freq = set.get(item);
-                set.put(item,freq+1);
+                set.put(item, freq + 1);
             }
         }
         int result = factorial(S.length());
-        for(Character item : set.keySet()) {
+        for (Character item : set.keySet()) {
             result /= factorial(set.get(item));
         }
         return result;
     }
-    int factorial(int n) {
-        if(n==0) return 1;
-        return n * factorial(n-1);
-    }
 
+    int factorial(int n) {
+        if (n == 0) return 1;
+        return n * factorial(n - 1);
+    }
 
 
 }
