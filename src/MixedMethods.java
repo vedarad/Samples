@@ -6,7 +6,83 @@ import java.util.*;
 public class MixedMethods {
 
     public static void main(String args[]) {
+        String[] pros = {"Jack", "Leon", "Maria"};
 
+        String[][] preferences = {{"Computer repair", "Handyman", "House cleaning"},
+                {"Computer lessons", "Computer repair", "Data recovery service"},
+                {"Computer lessons", "House cleaning"}};
+        proCategorization(pros, preferences);
+    }
+
+    static String[][][] proCategorization(String[] pros, String[][] preferences) {
+        Map<String,ArrayList<String>> m=new HashMap<String,ArrayList<String>>();
+        Map<String,ArrayList<String>> m1=new HashMap<String,ArrayList<String>>();
+        Set<String> s=new HashSet<String>();
+
+        for(int i=0;i<preferences.length;i++)
+        {
+            String [] ar;
+            ar=preferences[i];
+            for(String j:ar)
+                s.add(j);
+        }
+
+        List<String> sorted= new ArrayList<String>(s);
+        Collections.sort(sorted);
+
+        for(int i=0;i<pros.length;i++)
+        {
+            ArrayList<String> temp=new ArrayList<String>(Arrays.asList(preferences[i]));
+            m.put(pros[i],temp);
+        }
+
+        System.out.println("Current map:");
+        System.out.println(m);
+
+        for(int i=0;i<sorted.size();i++)
+        {    ArrayList<String> t1=new ArrayList<String>();
+            Iterator it=m.entrySet().iterator();
+            while(it.hasNext())
+            {
+                Map.Entry pair=(Map.Entry)it.next();
+                ArrayList<String> t;
+                t=(ArrayList<String>)pair.getValue();
+                if(t.contains(sorted.get(i)))
+                    t1.add((String)pair.getKey());
+            }
+            Collections.sort(t1);
+            m1.put(sorted.get(i),t1);
+        }
+
+        Map <String,ArrayList<String>> tm=new TreeMap<String,ArrayList<String>>(m1);
+        System.out.println("Updated map:");
+        System.out.println(tm);
+        String[][][] ret= new String [sorted.size()][][];
+        for (int i=0; i<sorted.size(); i++) {
+            ret[i] = new String[2][];
+            ret[i][0] = new String[] { sorted.get(i) };
+            ret[i][1] = tm.get(sorted.get(i)).toArray(new String[0]);
+        }
+        return ret;
+    }
+
+
+    static int[] ratingThreshold(double threshold, int[][] ratings) {
+        List<Integer> l1 = new ArrayList<>();
+        for(int i=0; i<ratings.length; i++){
+            double rating = 0;
+            for(int j=0; j<ratings[i].length; j++){
+                rating += ratings[i][j];
+            }
+            if(rating/ratings[i].length < threshold)
+                l1.add(i);
+        }
+        int[] res = new int[l1.size()];
+        for (int i=0; i < res.length; i++)
+        {
+            res[i] = l1.get(i).intValue();
+        }
+        return res;
     }
 
     static String displayDiff(String oldVersion, String newVersion) {
@@ -1154,54 +1230,6 @@ public class MixedMethods {
         }
     }
 
-
-     /*typedef std::vector<std::vector<char>> matrix;
-
-    std::vector<int> throwingBlocks(matrix field) {
-        struct Helper {
-            bool isFirstColumnFull(matrix field) {
-                bool result = true;
-                for (int i = 0; i < field.size(); i++) {
-                    result &= field[i][0] == '#';
-                }
-                return result;
-            }
-
-        void countMoves(matrix& field, std::vector<int>& result, int moves) {
-            if (isFirstColumnFull(field)) {
-                result[0] = std::min(result[0], moves);
-                result[1] = std::max(result[1], moves);
-                return;
-            }
-            for (int i = 0; i < field.size(); i++) {
-                if (field[i][0] == '#') {
-                    continue;
-                }
-                int j = i;
-                int column = 0;
-                while (column < field[j].size() && field[j][column] == '.') {
-                    column++;
-                }
-                column--;
-                while (j < field.size() && field[j][column] == '.') {
-                    j++;
-                }
-                j--;
-                field[j][column] = '#';
-                countMoves(field, result, moves + 1);
-                field[j][column] = '.';
-            }
-        }
-        };
-
-        const int INF = field.size() * field[0].size() + 1;
-        std::vector<int> result{INF, -INF};
-        Helper h;
-        h.countMoves(field, result, 0);
-        return result;
-    }*/
-
-    //TODO need modification
     static int[] throwingBlocks(char[][] field) {
         class Helper {
             boolean isFirstColumnFull(char[][] field) {
@@ -1228,7 +1256,7 @@ public class MixedMethods {
                         column++;
                     }
                     column--;
-                    while (j < field.length && field[j][column] == '.') {
+                    while (j < field[0].length && field[j][column] == '.') {
                         j++;
                     }
                     j--;
@@ -1239,11 +1267,23 @@ public class MixedMethods {
             }
         }
 
-        final int INF = field.length + field[0].length + 1;
+        final int INF = field.length * field[0].length + 1;
         int[] result = new int[]{INF, -INF};
         Helper h = new Helper();
         h.countMoves(field, result, 0);
         return result;
+    }
+
+    static int[][] create2DArray(int[] lengths) {
+        int[][] sum= new int[lengths.length][];
+        for(int i=0; i<lengths.length; i++){
+            sum[i]=new int[lengths[i]];
+            for(int k=0; k<lengths[i]; k++){
+                sum[i][k]=k;
+
+            }
+        }
+        return sum;
     }
 
 
