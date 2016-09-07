@@ -9,6 +9,323 @@ public class MixedMethods {
 
     }
 
+    static String displayDiff(String oldVersion, String newVersion) {
+        String result = "";
+
+        if(oldVersion.equals(newVersion))
+            return oldVersion;
+
+        if(oldVersion.length() == 0)
+            return "["+ newVersion + "]";
+
+        if(newVersion.length() == 0)
+            return "("+ oldVersion + ")";
+
+        int i = 0, j = 0;
+        while(i < oldVersion.length() && j < newVersion.length()){
+            if(oldVersion.charAt(i) == newVersion.charAt(j)){
+                if(result.contains("(") && !result.contains(")")){
+                    result += ")";
+                }
+                result += oldVersion.charAt(i);
+                i++; j++;
+            }else{
+                if(result.contains(")") && result.lastIndexOf(")") > result.lastIndexOf("(")){
+                    result += "(" + oldVersion.charAt(i);
+                    i++;
+                }else if(result.contains("(") && !result.contains(")")){
+                    result += oldVersion.charAt(i) + ")";
+                    i++;
+                } else {
+                    result += "(" + oldVersion.charAt(i);
+                    i++;
+                }
+            }
+        }
+        return result;
+    }
+
+    static String losslessDataCompression(String inputString, int width) {
+        String compressed="";
+        String window="";
+
+        for(int i=0; i< inputString.length();i++){
+            window=inputString.substring(Math.max(0, i-width), i);
+            int index=-1;
+            for(int j=Math.min(i+width, inputString.length()); j>i;j--){
+                index=window.indexOf(inputString.substring(i,j));
+                if(index>-1){
+                    int count=0;
+                    while(i+count< inputString.length() && index+count< window.length()&&inputString.charAt(i+count)==window.charAt(index+count)){
+                        count++;
+                    }
+                    index+=Math.max(0, i-width);
+                    compressed+="("+index+","+count+")";
+                    i=i+count-1;
+                    break;
+                }
+            }
+            if(index<0){
+                compressed+=inputString.charAt(i);
+            }
+        }
+        return compressed;
+    }
+
+    static int[][] opponentMatching(int[] XP) {
+
+        if(XP.length==1)
+            return new int[][]{};
+
+        if(XP.length==2)
+            return new int[][]{{0,1}};
+
+        List<List<Integer>> list = new ArrayList<>();
+
+        for(int i=0; i<XP.length; i++){
+            for(int j=i+1; j<XP.length; j++){
+                List<Integer> l2 = new ArrayList<>();
+                if(XP[i]==XP[j]){
+                    l2.add(i);
+                    l2.add(j);
+                    list.add(l2);
+                }
+            }
+        }
+
+        return new int[][]{};
+    }
+
+
+    static int marathonTaskScore(int marathonLength, int maxScore, int submissions, int successfulSubmissionTime) {
+
+        if(successfulSubmissionTime <= 0)
+            return 0;
+
+        int result = maxScore;
+        int failedSubmissions = 10 * (submissions -1);
+        int minutesPenalty = (successfulSubmissionTime * (maxScore/2))/100;
+        result = result - failedSubmissions - minutesPenalty;
+
+        if(result <= maxScore/2)
+            return maxScore/2;
+        else
+            return result;
+
+    }
+
+    static boolean plagiarismCheck(String[] code1, String[] code2) {
+        int e = 0;
+        // Number of lines do not match
+        if (code1.length != code2.length) {
+            return false;
+        }
+        // removing variable names and comparing.
+        // Better to get the variable name and replace them throughout the code.
+        for (int i = 0; i < code1.length; i++) {
+            remove(code1, i);
+            remove(code2, i);
+            if (code1[i].equals(code2[i])) {
+                e++;
+            }
+        }
+        if (e == code1.length) {
+            return true;
+        }
+        return false;
+    }
+
+    static void remove(String[] code1, int i) {
+        int b = code1[i].indexOf("(");
+        if (code1[i].indexOf("(") > -1) {
+            code1[i] = code1[i].substring(0, b + 1)
+                    + code1[i].substring(code1[i].indexOf(")"));
+            b = code1[i].indexOf("(");
+        }
+    }
+
+    int[] fractionMultiplication(int[] A, int[] B) {
+
+        class Helper {
+            int gcdEuclid(int a, int b) {
+                if (a == 0) {
+                    return b;
+                }
+                return  gcdEuclid(b%a, a) ;
+            }
+        }
+        Helper h = new Helper();
+
+        int[] C = {A[0] * B[0], A[1] * B[1]};
+        int gcd = h.gcdEuclid(C[0], C[1]);
+
+        C[0] /= gcd;
+        C[1] /= gcd;
+
+        return C;
+    }
+
+
+    static int[] howManyLines(int[] X, int[] Y) {
+
+        int[] result = new int[X.length - 1];
+        Arrays.fill(result, 0);
+
+        for (int i = 0; i < X.length; i++) {
+            for (int j = i + 1; j < X.length; j++) {
+                int A = Y[i] - Y[j],
+                        B = X[j] - X[i],
+                        C =  j ,
+                        countPoints = 0;
+                for (int k = 0; k < X.length; k++) {
+                    if (A * X[k] + B * Y[k] + C == 0) {
+                        countPoints++;
+                    }
+                }
+                result[countPoints]++;
+            }
+        }
+        for (int i = 0; i < X.length - 1; i++) {
+            result[i] /= (i + 1) * (i + 2) / 2;
+        }
+        return result;
+    }
+
+
+    static int multisetPermutations(int[] multiset) {
+        Arrays.sort(multiset);
+        int[] firstArray = new int[multiset.length];
+        for (int i = multiset.length - 1; i >= 0; i--)
+            firstArray[firstArray.length - i - 1] = multiset[i];
+        int c = 0;
+        do {
+            c++;
+        } while (!Arrays.equals(nextPermutation(multiset), firstArray));
+        return c;
+    }
+
+    static int[] nextPermutation(int[] c) {
+        // 1. finds the largest k, that c[k] < c[k+1]
+        int first = getFirst(c);
+        if (first == -1) return null; // no greater permutation
+        // 2. find last index toSwap, that c[k] < c[toSwap]
+        int toSwap = c.length - 1;
+        while (c[first] >= (c[toSwap]))
+            --toSwap;
+        // 3. swap elements with indexes first and last
+        swap(c, first++, toSwap);
+        // 4. reverse sequence from k+1 to n (inclusive)
+        toSwap = c.length - 1;
+        while (first < toSwap)
+            swap(c, first++, toSwap--);
+        return c;
+    }
+    static int getFirst(int[] c) {
+        for (int i = c.length - 2; i >= 0; --i)
+            if (c[i] < (c[i + 1]))
+                return i;
+        return -1;
+    }
+    static void swap(int[] c, final int i, final int j) {
+        int tmp = c[i];
+        c[i] = c[j];
+        c[j] = tmp;
+    }
+
+    static int[] maximalAllowableSubarrays(int[] inputArray, int maxSum) {
+
+        int[] right = new int[inputArray.length];
+        int j = -1;
+        int curSum = 0;
+        for (int i = 0; i < inputArray.length; i++) {
+            if (i > 0) {
+                curSum -= inputArray[i - 1];
+            }
+            while (j + 1 < inputArray.length && curSum + inputArray[j + 1] <= maxSum) {
+                curSum += inputArray[++j];
+            }
+            right[j] = i;
+        }
+
+        return right;
+    }
+
+    int[] switchLights(int[] a) {
+
+        int[] b = new int[a.length];
+        boolean change = false;
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] == 1) {
+                change = !change;
+            }
+            b[i] = change ? 1 - a[i] : a[i];
+        }
+
+        return b;
+    }
+
+    int trapRooms(final char[][] museum) {
+        int trapsNumber = 0;
+
+        class Helper {
+            boolean[][] visited;
+            boolean[][] answer;
+            int componentSize;
+
+            Helper(int h, int w) {
+                visited = new boolean[h][];
+                answer = new boolean[h][];
+                for (int i = 0; i < h; i++) {
+                    visited[i] = new boolean[w];
+                    answer[i] = new boolean[w];
+                }
+            }
+
+            boolean dfs(int x, int y) {
+                if (x < 0 || x >= museum.length ||
+                        y < 0 || y >= museum[0].length) {
+                    return true;
+                }
+                if (answer[x][y]) {
+                    return answer[x][y];
+                }
+                visited[x][y] = true;
+                componentSize++;
+                switch (museum[x][y]) {
+                    case 'L':
+                        answer[x][y] = dfs(x, y - 1);
+                        break;
+                    case 'U':
+                        answer[x][y] = dfs(x - 1, y);
+                        break;
+                    case 'R':
+                        answer[x][y] = dfs(x, y + 1);
+                        break;
+                    case 'D':
+                        answer[x][y] = dfs(x + 1, y);
+                        break;
+                }
+                return answer[x][y];
+            }
+        };
+
+        Helper h = new Helper(museum.length, museum[0].length);
+
+        for (int i = 0; i < museum.length; i++) {
+            for (int j = 0; j < museum[0].length; j++) {
+                if (!h.visited[i][j]) {
+                    h.componentSize = 0;
+                    if (!h.dfs(i, j)) {
+                        trapsNumber += h.componentSize;
+                    }
+                }
+            }
+        }
+
+        return trapsNumber;
+    }
+
+
     int isSumOfConsecutive2(int n) {
         int sum=0,c=0,j=0;
         int count =0;
@@ -192,7 +509,6 @@ public class MixedMethods {
         return -1;
     }
 
-    //TODO
     String[] repeatedSubstring(String inputString, int k) {
 
         List<String> result = new ArrayList<>();
@@ -228,8 +544,6 @@ public class MixedMethods {
         return result.toArray(new String[result.size()]);
     }
 
-
-    //TODO
     static int holiday(int x, String weekDay, String month, int yearNumber) {
         final List<String> months = new ArrayList<String>(
                 Arrays.asList(new String[]{

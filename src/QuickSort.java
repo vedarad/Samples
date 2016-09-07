@@ -5,7 +5,7 @@ public class QuickSort {
     private int array[];
     private int length;
 
-    public static void sort(int[] inputArr) {
+    public void sort(int[] inputArr) {
 
         if (inputArr == null || inputArr.length == 0) {
             return;
@@ -15,7 +15,7 @@ public class QuickSort {
         quickSort(0, length - 1);
     }
 
-    private static void quickSort(int lowerIndex, int higherIndex) {
+    private void quickSort(int lowerIndex, int higherIndex) {
 
         int i = lowerIndex;
         int j = higherIndex;
@@ -48,7 +48,8 @@ public class QuickSort {
     public static void main(String a[]){
         int[] input = {24,2,45,20,56,75,2,56,99,53,12};
         System.out.println("Unsorted array: "+Arrays.toString(input));
-        sort(input);
+        QuickSort qs = new QuickSort();
+        qs.sort(input);
         System.out.println("Sorted Array: "+Arrays.toString(input));
     }
 }
