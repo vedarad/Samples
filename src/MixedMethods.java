@@ -9,6 +9,200 @@ public class MixedMethods {
 
     }
 
+    int leastCommonMultiple(int a, int b) {
+
+        int gcd = 1;
+        for (int divisor = 2; divisor <= Math.min(a, b); divisor++) {
+            if (a % divisor == 0 && b % divisor == 0) {
+                gcd =  divisor ;
+            }
+        }
+
+        return a * b / gcd;
+    }
+
+    ArrayList<Integer> cyclicQueue(String[] commands) {
+
+        final int maxSize = 100;
+        int[] myQueue = new int[maxSize];
+        ArrayList<Integer> answer = new ArrayList<>();
+        int head = 0;
+        int tail = 0;
+        int sum = 0;
+
+        for (int i = 0; i < commands.length; i++) {
+            if (commands[i].equals("-")) {
+                sum -= myQueue[head];
+                head = (head + 1) % maxSize;
+            }
+            else {
+                int value = 0;
+                for (int j = 1; j < commands[i].length(); j++) {
+                    value = value * 10 + (int)commands[i].charAt(j) - (int)'0';
+                }
+                sum += value;
+                myQueue[tail] = value;
+                tail++;
+            }
+            answer.add(sum);
+        }
+
+        return answer;
+    }
+
+
+    boolean isInsideTheCircle(int xa, int ya, int xc, int yc, int rc) {
+        int dist = (xa - xc) * (xa - xc) + (ya - yc) * (ya - yc);
+        rc *= rc;
+        if (dist < rc) {
+            return true;
+        }
+        return false;
+    }
+
+    String whoseMove(String lastPlayer, boolean win) {
+        if (lastPlayer.equals("white")) {
+            if (win) {
+                return "white";
+            }
+            else {
+                return  "black" ;
+            }
+        }
+        else {
+            if (win) {
+                return "black";
+            }
+            else {
+                return "white";
+            }
+        }
+    }
+
+    int wordGuessingGame(final String[] words) {
+        class Helper {
+            boolean match(int mask) {
+                HashSet<String> patterns = new HashSet<>();
+                for (int i = 0; i < words.length; i++) {
+                    StringBuilder pattern = new StringBuilder();
+                    for (int j = 0; j < words[0].length(); j++) {
+                        if ((mask & (1 << j)) > 0) {
+                            pattern.append(words[i].charAt(j));
+                        }
+                    }
+                    patterns.add(pattern.toString());
+                }
+                return patterns.size() == words.length;
+            }
+
+            int findWinningTurn(int mask) {
+                for (int j = 0; j < words[0].length(); j++) {
+                    if ((mask & (1 << j)) > 0) {
+                        continue;
+                    }
+                    if (match(mask | (1 << j))) {
+                        return j;
+                    }
+                    int turn = findWinningTurn(mask | (1 << j));
+                    if (turn == -1) {
+                        return j;
+                    }
+                }
+                return -1;
+            }
+        };
+
+        Helper h = new Helper();
+        return h.findWinningTurn(0);
+    }
+
+    int sequenceElement(int[] a, int n) {
+
+        final int MOD = (int) 1e5;
+        List<Integer> seq = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            seq.add(a[i]);
+        }
+
+        int lastFive = a[0] * (int)1e4 + a[1] * (int)1e3 +
+                a[2] * (int)1e2 + a[3] * 10 + a[4];
+        Map<Integer, Integer> was = new HashMap<>();
+        was.put(lastFive, 4);
+
+        for (int i = 5;; i++) {
+            seq.add((seq.get(i - 1) + seq.get(i - 2) +
+                    seq.get(i - 3) + seq.get(i - 4) + seq.get(i - 5)) % 10);
+            lastFive = (lastFive * 10 + seq.get(i)) % MOD;
+            if (was.containsKey(lastFive)) {
+                int last = was.get(lastFive);
+                return  seq.get(n % (i - last)) ;
+            } else {
+                was.put(lastFive, i);
+            }
+        }
+    }
+
+
+    boolean arePrizesOK(int first, int second, int third) {
+        if (first < second) {
+            return false;
+        }
+        if (second < third) {
+            return false;
+        }
+        return true;
+    }
+
+
+    int crossingSum(int[][] matrix, int a, int b) {
+        int res=0;
+        for (int i=0; i<matrix.length; ++i) res+=matrix[i][b];
+        for (int i=0; i<matrix[0].length; ++i) res+=matrix[a][i];
+        res-=matrix[a][b];
+        return res;
+    }
+
+    int factorizedGCD(int[] a, int[] b) {
+        int j = 0,
+                result = 1;
+        for (int i = 0; i < a.length; i++) {
+            while (j < b.length && a[i] > b[j]) {
+                j++;
+            }
+            if (j < b.length && a[i] == b[j]) {
+                result *=  a[i] ;
+                j++;
+            }
+        }
+        return result;
+    }
+
+    int countTowers(int n, int m, int height) {
+
+        int[][] dp = new int[height][1 << n * m];
+        int result = 0;
+
+        for (int i = 0; i < (1 << n * m); i++) {
+            dp[0][i] = 1;
+        }
+
+        for (int i = 0; i < height - 1; i++) {
+            for (int j = 0; j < (1 << n * m); j++) {
+                for (int k = 0; k < (1 << n * m); k++) {
+                    if ((j & k) == j) {
+                        dp[i + 1][j] += dp[i][k];
+                    }
+                }
+            }
+        }
+
+        for (int i = 1; i < (1 << n * m); i++) {
+            result += dp[height - 1][i];
+        }
+        return result;
+    }
+
+
     boolean higherVersion(String ver1, String ver2) {
 
         String[] a = ver1.split("\\.");
