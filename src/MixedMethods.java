@@ -6,13 +6,167 @@ import java.util.*;
 public class MixedMethods {
 
     public static void main(String args[]) {
-        String[] pros = {"Jack", "Leon", "Maria"};
 
-        String[][] preferences = {{"Computer repair", "Handyman", "House cleaning"},
-                {"Computer lessons", "Computer repair", "Data recovery service"},
-                {"Computer lessons", "House cleaning"}};
-        proCategorization(pros, preferences);
     }
+
+    boolean higherVersion(String ver1, String ver2) {
+
+        String[] a = ver1.split("\\.");
+        String[] b = ver2.split("\\.");
+        for (int i = 0; i < a.length; i++) {
+            int cmp = Integer.parseInt(a[i]) - Integer.parseInt(b[i]);
+            if (cmp > 0) {
+                return true;
+            } else if (cmp < 0) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    ArrayList<Integer> possibleHeights(int[] parent) {
+
+        class Graph {
+            ArrayList<Integer>[] edges;
+            int[] height;
+            boolean[] isPossibleHeight;
+
+            Graph(int[] parent) {
+                edges = new ArrayList[parent.length];
+                for (int i = 0; i < edges.length; i++) {
+                    edges[i] = new ArrayList();
+                }
+                for (int i = 1; i < parent.length; i++) {
+                    edges[parent[i]].add(i);
+                }
+                height = new int[parent.length];
+                isPossibleHeight = new boolean[parent.length];
+            }
+
+            void calcHeight(int v) {
+                for (int u : edges[v]) {
+                    calcHeight(u);
+                    height[v] = Math.max(height[v], height[u] + 1);
+                }
+                ArrayList<Integer>[] countHeights = new ArrayList[edges.length];
+                for (int i = 0; i < edges.length; i++) {
+                    countHeights[i] = new ArrayList<>();
+                }
+                for (int i = 0; i < edges[v].size(); i++) {
+                    int u = edges[v].get(i);
+                    countHeights[height[u]].add(u);
+                }
+                edges[v].clear();
+                for (int i = edges.length - 1; i >= 0; i--) {
+                    for (int j = 0; j < countHeights[i].size(); j++) {
+                        edges[v].add(countHeights[i].get(j));
+                    }
+                }
+            }
+
+            void findNewHeights(int v, int tailHeight) {
+                isPossibleHeight[Math.max(height[v], tailHeight)] = true;
+                int firstMaxHeight = tailHeight + 1;
+                int secondMaxHeight = tailHeight + 1;
+                if (edges[v].size() > 0) {
+                    firstMaxHeight = Math.max(firstMaxHeight, height[edges[v].get(0)] + 2);
+                }
+                if (edges[v].size() > 1) {
+                    secondMaxHeight = Math.max(secondMaxHeight, height[edges[v].get(1)] + 2);
+                }
+                if (edges[v].size() > 0) {
+                    findNewHeights(edges[v].get(0), secondMaxHeight);
+                }
+                for (int i = 1; i < edges[v].size(); i++) {
+                    findNewHeights(edges[v].get(i), firstMaxHeight);
+                }
+            }
+        }
+
+        Graph g = new Graph(parent);
+        g.calcHeight(0);
+        g.findNewHeights(0, 0);
+
+        ArrayList<Integer> heights = new ArrayList<>();
+        for(int i = 0; i < g.isPossibleHeight.length; i++){
+            if(g.isPossibleHeight[i]) {
+                heights.add(i);
+            }
+        }
+        return heights;
+    }
+
+    static ArrayList<Integer> treeBottom(final String tree) {
+        class Helper {
+            ArrayList<ArrayList<Integer>> nodes = new ArrayList<>();
+            void treeParse(int depth, int l, int r) {
+                int pos = l;
+                int value = 0;
+                int balance = 0;
+                int nextL = -1;
+                int nextR = -1;
+                if (l == r) {
+                    return;
+                }
+                if (nodes.size() == depth) {
+                    nodes.add(new ArrayList<Integer>());
+                }
+                while (tree.charAt(pos) != ' ') {
+                    value *=10;
+                    value+=tree.charAt(pos)-'0';
+                    pos++;
+                }
+                nodes.get(depth).add(value);
+                for (int iter = 0;	 iter < 2; iter++) {
+                    balance = 1;
+                    pos += 2;
+                    nextL = pos;
+                    while (balance > 0) {
+                        if (tree.charAt(pos) == '(') {
+                            balance++;
+                        }
+                        if (tree.charAt(pos) == ')') {
+                            balance--;
+                        }
+                        pos++;
+                    }
+                    nextR = pos - 1;
+                    treeParse(depth + 1, nextL, nextR);
+                }
+            }
+        };
+
+        Helper h = new Helper();
+        h.treeParse(0, 1, tree.length() - 1);
+        return h.nodes.get(h.nodes.size() - 1);
+    }
+
+
+    static int[] sumOfBigNumbers(int base, int[] a, int[] b) {
+
+        ArrayList<Integer> c = new ArrayList<>();
+        int next = 0;
+        for (int i = a.length - 1, j = b.length - 1; i >= 0 || j >= 0 || next > 0; i--, j--) {
+            int cur = next;
+            if (i >= 0) {
+                cur += a[i];
+            }
+            if (j >= 0) {
+                cur += b[j];
+            }
+            c.add(cur % base);
+            next = cur / base;
+        }
+
+        Collections.reverse(c);
+        int[] result = new int[c.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = c.get(i);
+        }
+        return result;
+    }
+
 
     static String[][][] proCategorization(String[] pros, String[][] preferences) {
         Map<String,ArrayList<String>> m=new HashMap<String,ArrayList<String>>();
@@ -485,76 +639,6 @@ public class MixedMethods {
             }
         }
         return r;
-    }
-
-    ArrayList<Integer> possibleHeights(int[] parent) {
-
-        class Graph {
-            ArrayList<Integer>[] edges;
-            int[] height;
-            boolean[] isPossibleHeight;
-
-            Graph(int[] parent) {
-                edges = new ArrayList[parent.length];
-                for (int i = 0; i < edges.length; i++) {
-                    edges[i] = new ArrayList();
-                }
-                for (int i = 1; i < parent.length; i++) {
-                    edges[parent[i]].add(i);
-                }
-                height = new int[parent.length];
-                isPossibleHeight = new boolean[parent.length];
-            }
-
-            void calcHeight(int v) {
-                for (int u : edges[v]) {
-                    calcHeight(u);
-                    height[v] = Math.max(height[v], height[u] + 1);
-                }
-                ArrayList<Integer>[] countHeights = new ArrayList[edges.length];
-                for (int i = 0; i < edges.length; i++) {
-                    countHeights[i] = new ArrayList<>();
-                }
-                for (int i = 0; i < edges[v].size(); i++) {
-                    int u = edges[v].get(i);
-                    countHeights[height[u]].add(u);
-                }
-                edges[v].clear();
-                for (int i = edges.length - 1; i >= 0; i--) {
-                    for (int j = 0; j < countHeights[i].size(); j++) {
-                        edges[v].add(countHeights[i].get(j));
-                    }
-                }
-            }
-
-            void findNewHeights(int v, int tailHeight) {
-                isPossibleHeight[Math.max(height[v], tailHeight)] = true;
-                int firstMaxHeight = tailHeight + 1;
-                int secondMaxHeight = tailHeight + 1;
-                if (edges[v].size() > 0) {
-                    firstMaxHeight = Math.max(firstMaxHeight, height[edges[v].get(0)] + 2);
-                }
-                //TODO
-                if (edges[v].size() > 0) {
-                    findNewHeights(edges[v].get(0), secondMaxHeight);
-                }
-                for (int i = 1; i < edges[v].size(); i++) {
-                    findNewHeights(edges[v].get(i), firstMaxHeight);
-                }
-            }
-        }
-
-        Graph g = new Graph(parent);
-        g.calcHeight(0);
-        g.findNewHeights(0, 0);
-
-        ArrayList<Integer> heights = new ArrayList<>();
-        for (int i = 0; i < parent.length; i++) {
-            if (g.isPossibleHeight[i]) {
-                heights.add(i);
-            }
-        }
-        return heights;
     }
 
 
