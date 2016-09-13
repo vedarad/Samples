@@ -16,7 +16,7 @@ public class MySelectionSort {
         for(int i=0; i<ns.length-1; i++){
             pos = i;
             for(int j=i+1; j<ns.length; j++){
-                if(ns[j]>ns[pos])
+                if(ns[j]<ns[pos])
                     pos = j;
             }
             temp = ns[i];
