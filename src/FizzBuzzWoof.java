@@ -14,10 +14,14 @@ public class FizzBuzzWoof {
                     (i % 7 == 0) ? "Woof": i
             );
         }
+
     }
 
     public static void main(String args[]){
         FizzBuzzWoof s = new FizzBuzzWoof();
-        s.solution(105);
+        long start = System.currentTimeMillis();
+        s.solution(1000);
+        long stop = System.currentTimeMillis();
+        System.out.println("Time taken to exceute: " + (stop - start) + "ms");
     }
 }
